@@ -218,6 +218,21 @@ h1 {
   color: #000;
   cursor: pointer;
 }
+.button-wrapper-modal{
+  width:100%;
+  display: flex;
+  justify-content: end;
+}
+.button-transparent{
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  width: 20px;
+  aspect-ratio: 1;
+  position: relative;
+  margin-left: -1px;
+  cursor: pointer;
+}
 .button-pink {
   background-color: var(--color-pink);
 }
