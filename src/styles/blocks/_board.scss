@@ -17,6 +17,11 @@
             grid-template-columns: 1fr 1fr;
             gap:10px;
         }
+        @include mobile{
+            display: grid;
+            grid-template-columns: 1fr;
+            gap:20px;
+        }
     }
     &__title-wrapper{
         margin-bottom: 10px;
