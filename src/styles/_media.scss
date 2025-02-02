@@ -1,8 +1,17 @@
 $tablet:1024px;
 $tablet-above:1025px;
 
+$mobile:808px;
+$mobile-above:809px;
+
 @mixin tablet{
     @media(width < $tablet){
         @content;
     }
+}
+
+@mixin mobile{
+    @media(width < $mobile){
+        @content;
+    }   
 }
