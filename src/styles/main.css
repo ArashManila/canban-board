@@ -254,6 +254,11 @@ h1 {
   padding: var(--padding-small);
   width: 423px;
 }
+@media(max-width:808px){
+  .board-item {
+    width: 80vw;
+  }
+}
 .board__list {
   display: flex;
   align-items: start;
