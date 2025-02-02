@@ -12,16 +12,21 @@
         justify-content: center;
 
         column-gap: 10px;
-        @include tablet{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap:10px;
-        }
-        @include mobile{
-            display:flex;
-            flex-direction: column;
-            row-gap: 20px;
-        }
+        @media (max-width:1024px) {
+            .board__list {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+            }
+          }
+          @media (max-width:808px) {
+            .board__list {
+              display: flex;
+              justify-content: center;
+              flex-direction: column;
+              row-gap: 20px;
+            }
+          }
     }
     &__title-wrapper{
         margin-bottom: 10px; 
