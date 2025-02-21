@@ -6,34 +6,29 @@ import Modal from "../Modal/Modal";
 import SetDataForm from "../Forms/SetDataForm";
 import CardItem from "../Cards/CardItem";
 
-import { cardContent, CardType, TableData } from "../../types/types";
+import { cardContent } from "../../types/types";
 import AddCard from "../Cards/AddCard";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { selectTableName, tablesSlice } from "../../modules/tables-slice";
+import {  selectCards } from "../../modules/cards-slice";
 
 
 type TableProps={
   tableId:number,
-  updateTableData:(arg:TableData)=>void
-  table:TableData,
-  cardsData:cardContent,
-  updateCardData:(arg:CardType)=>void,
-  removeCard:(arg1:number,arg2:string)=>void
 }
 
-const Table = ({removeCard,updateCardData,cardsData,updateTableData,tableId,table}:TableProps)=>{
-  
-  const [tableName,setTableName] = useState<string>(table.name) ;
+const Table = ({tableId}:TableProps)=>{
   const [activeTableNameEdit,setActiveTableNameEdit] = useState<boolean>(false);
 
   const close=()=>setActiveTableNameEdit(false);
 
+  const dispatch = useAppDispatch();
   const setNewTableName=(e:string)=>{
-    const newData:TableData = structuredClone(table);
-    newData.name = e;
-    setTableName(e);
-    updateTableData(newData);
+    dispatch(tablesSlice.actions.setTableName({tableId:tableId,newTableName:e}));
   }
+  const tableName = useAppSelector((state)=>selectTableName(state.tables,tableId))
 
-  const filteredCards:cardContent = cardsData || {};
+  const filteredCards:cardContent = useAppSelector((state)=>selectCards(state.cards,tableId)) || {};
   
   return(
     <li className="board-item" >
@@ -42,14 +37,14 @@ const Table = ({removeCard,updateCardData,cardsData,updateTableData,tableId,tabl
         <div>
           <img src={Edit} alt="edit" onClick={()=>setActiveTableNameEdit(true)}/>
           {activeTableNameEdit && <Modal active={activeTableNameEdit} setActive={setActiveTableNameEdit}>
-            <SetDataForm changeData={(e)=>setNewTableName(e)} placeholder="Enter new title" prev={tableName} close={close}/>
+            <SetDataForm changeData={setNewTableName} placeholder="Enter new title" prev={tableName} close={close}/>
           </Modal>}
         </div>
       </div>
-      <AddCard updateCardState={updateCardData} tableId={tableId}/>
+      <AddCard tableId={tableId}/>
       <ul className="card__list">
       {Object.entries(filteredCards).map(([key, value]) => (
-          <CardItem remove={removeCard} updateCardState={updateCardData} content={value} key={key} />
+          <CardItem content={value} key={key} />
         ))} 
       </ul>
     </li>
