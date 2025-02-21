@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 
 import utiles from "../../utiles/utiles";
 
@@ -6,6 +6,7 @@ import { CommentsType } from "../../types/types";
 import data from "../../DataManagment/dataM";
 import { useAppDispatch } from "../../redux/store";
 import { commentsSlice } from "../../modules/comments-slice";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 type AddCommentFormProps = {
   close: () => void;
@@ -13,54 +14,63 @@ type AddCommentFormProps = {
   card: string;
 };
 
+interface addCommentI{
+  text:string
+}
+
 const AddCommentsForm = ({
   card,
   close,
   placeholder,
 }: AddCommentFormProps) => {
   const id = utiles.makeid(4);
-  const userName: string = data.Get("User name") || "defult name";
-  const dispatch = useAppDispatch();
+  const {register,handleSubmit,reset} = useForm<addCommentI>({
+    mode:"onChange"
+  });
 
-  const [commentText, setCommentText] = useState<string>("");
-  const create = (arg:CommentsType)=>{
-    dispatch(commentsSlice.actions.addComment({cardId:arg}));
-  }
-
-  const handleText = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCommentText(e.target.value);
-  };
-
-  const saveComment = () => {
-    if (commentText === "") return;
-    const data: CommentsType = {
-      text: commentText,
+  const onSubmit:SubmitHandler<addCommentI> = (data)=>{
+    if (data.text === "") return;
+    const comment: CommentsType = {
+      text: data.text,
       commentId: id,
       user: userName,
       cardId: card,
     };
-    create(data);
+    create(comment);
     close();
-  };
+  }
+
+  const userName: string = data.Get("User name") || "defult name";
+  const dispatch = useAppDispatch();
+
+  const create = (arg:CommentsType)=>{
+    dispatch(commentsSlice.actions.addComment({cardId:arg}));
+  }
+
+  useEffect(()=>{
+    reset({
+      text:'comment text'
+    })
+  },[reset])
+
 
   return (
-    <div>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <input
-        value={commentText}
-        onChange={handleText}
-        name=""
-        id=""
+        {...register("text",{
+          required:"invalid text",
+        })}
         placeholder={placeholder}
       ></input>
       <div className="flex p-1">
         <button
-          onClick={() => saveComment()}
           className="p-1 rounded bg-sky-600 text-white mr-2"
+          type="submit"
         >
           Add Comment
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

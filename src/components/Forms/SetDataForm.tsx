@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 type DataFormProps={
     placeholder?:string,
@@ -6,21 +7,40 @@ type DataFormProps={
     close:()=>void,
     changeData:(prev:string)=>void
 }
+
+interface dataFormI{
+  data:string
+}
+
 const SetDataForm = ({changeData,placeholder,close,prev}: DataFormProps)=>{
-  
-  const[newData,setNewData] = useState(prev);
-  const saveData = ()=>{
-    if(!newData) return;
-    changeData(newData);
+
+  const {register,handleSubmit,reset} = useForm<dataFormI>({
+    mode:"onChange"
+  })
+
+  useEffect(()=>{
+    reset({
+      data:prev
+    })
+  },[reset])
+
+  const onSubmit:SubmitHandler<dataFormI> = (data)=>{
+    if(!data) return;
+    changeData(data.data);
     close();
   }
     
   return(
-    <div>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <label htmlFor="ChangeData">{placeholder}</label>
-      <input type="text" value={newData} onChange={(e)=>setNewData(e.target.value)} id="ChangeData" maxLength={24}/>
-      <button className="button" onClick={saveData} type="button">Confirm</button>
-    </div>
+      <input 
+        type="text" 
+        {...register("data",{required:true})}
+        id="ChangeData" 
+        maxLength={24}
+      />
+      <button className="button" type="submit">Confirm</button>
+    </form>
   );
 }
 
