@@ -4,24 +4,28 @@ import utiles from "../../utiles/utiles";
 
 import { CommentsType } from "../../types/types";
 import data from "../../DataManagment/dataM";
+import { useAppDispatch } from "../../redux/store";
+import { commentsSlice } from "../../modules/comments-slice";
 
 type AddCommentFormProps = {
   close: () => void;
-  create: (arg: CommentsType) => void;
   placeholder: string;
   card: string;
 };
 
 const AddCommentsForm = ({
   card,
-  create,
   close,
   placeholder,
 }: AddCommentFormProps) => {
   const id = utiles.makeid(4);
   const userName: string = data.Get("User name") || "defult name";
+  const dispatch = useAppDispatch();
 
   const [commentText, setCommentText] = useState<string>("");
+  const create = (arg:CommentsType)=>{
+    dispatch(commentsSlice.actions.addComment({cardId:arg}));
+  }
 
   const handleText = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCommentText(e.target.value);

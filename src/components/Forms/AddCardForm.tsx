@@ -32,6 +32,7 @@ const AddCardForm = ({create,close,tid}:AddCardFormProps)=>{
       cardId:id,
       tableId:tid
     }
+    
     create(data);
     close();
   }

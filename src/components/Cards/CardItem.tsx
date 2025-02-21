@@ -11,18 +11,23 @@ import CardInfo from "./CardInfo";
 
 import { CardType } from "../../types/types";
 import data from "../../DataManagment/dataM";
+import { useAppDispatch } from "../../redux/store";
+import { cardsSlice } from "../../modules/cards-slice";
 
 type CardProps = {
   content: CardType;
-  updateCardState: (arg: CardType) => void;
-  remove: (arg1: number, arg2: string) => void;
+  // updateCardState: (arg: CardType) => void;
+  // remove: (arg1: number, arg2: string) => void;
 };
 
-const CardItem = ({ remove, content, updateCardState }: CardProps) => {
+const CardItem = ({  content }: CardProps) => {
+  
   const [activeCard, setActiveCard] = useState(false);
   const [activeTitleEdit, setActiveTitleEdit] = useState(false);
   const [activeDescEdit, setActiveDescEdit] = useState(false);
   const [activeDescCreate, setActiveDescCreate] = useState(false);
+
+  const dispatch = useAppDispatch();
 
   const closeTitle = () => {
     setActiveTitleEdit(false);
@@ -38,21 +43,18 @@ const CardItem = ({ remove, content, updateCardState }: CardProps) => {
   };
 
   const RemoveCardDesc = () => {
-    const newData = structuredClone(content);
-    newData.desc = "";
-    updateCardState(newData);
+    dispatch(cardsSlice.actions.setCardDesc({tableId: content.tableId, cardId: content.cardId,newCardDesc:""}))
   };
 
-  const setCardDesc = (newDesc: string) => {
-    const newData = structuredClone(content);
-    newData.desc = newDesc;
-    updateCardState(newData);
+  const setCardDesc = (newCardDesc: string) => {
+    dispatch(cardsSlice.actions.setCardDesc({tableId: content.tableId, cardId: content.cardId,newCardDesc}))
   };
-  const ChangeCardTitle = (newTitle: string) => {
-    const newData = structuredClone(content);
-    newData.title = newTitle;
-    updateCardState(newData);
+  const ChangeCardTitle = (newCardTitle: string) => {
+    dispatch(cardsSlice.actions.setCardTitle({tableId: content.tableId, cardId: content.cardId,newCardTitle}))
   };
+  const removeCard = ()=>{
+    dispatch(cardsSlice.actions.removeCard({tableId: content.tableId, cardId: content.cardId}))
+  }
 
   const HandlePopUp = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -112,7 +114,7 @@ const CardItem = ({ remove, content, updateCardState }: CardProps) => {
         <button
           className="card__item-footer-button button button-pink"
           type="button"
-          onClick={() => remove(content.tableId, content.cardId)}
+          onClick={removeCard}
         >
           Delete
         </button>

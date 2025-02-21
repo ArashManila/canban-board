@@ -4,21 +4,22 @@ import Modal from "../Modal/Modal";
 import AddCardForm from "../Forms/AddCardForm";
 
 import { CardType } from "../../types/types";
+import { useAppDispatch } from "../../redux/store";
+import { cardsSlice } from "../../modules/cards-slice";
 
 type AddCardProps ={
   tableId:number,
-  updateCardState:(arg:CardType)=>void
 }
 
-const AddCard = ({tableId,updateCardState}:AddCardProps) => {
+const AddCard = ({tableId}:AddCardProps) => {
   
-  
+  const dispatch = useAppDispatch();
   const [activeCardCreate, setActiveCardCreate] = useState(false);
 
   const CloseModal = () => setActiveCardCreate(false);
 
   const CreateCard = (dataInfo:CardType)=>{
-    updateCardState(dataInfo);
+    dispatch(cardsSlice.actions.addCard({tableId:dataInfo}))
   }
 
   return (

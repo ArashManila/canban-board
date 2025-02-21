@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import addition from "../../icons/add.png";
 
@@ -6,9 +6,10 @@ import Modal from "../Modal/Modal";
 import AddCommentsForm from "../Forms/AddCommentsForm";
 import CommentsBlock from "../Comments/CommentsBlock";
 
-import { CardType, CommentsObjectType, CommentsType } from "../../types/types";
+import { CardType } from "../../types/types";
 
 import data from "../../DataManagment/dataM";
+import { useAppSelector } from "../../redux/store";
 
 type CardInfoProps = {
   content: CardType;
@@ -20,34 +21,17 @@ const CardInfo = ({ content }: CardInfoProps) => {
 
   const close = () => setActiveCommentCreate(false);
 
-  const [commentsData, setCommentsData] = useState<CommentsObjectType>(() => {
-    const newData = data.Get("commentsData");
-    if (newData) return JSON.parse(newData);
-    else return {};
-  });
+  // const [commentsData, setCommentsData] = useState<CommentsObjectType>(() => {
+  //   const newData = data.Get("commentsData");
+  //   if (newData) return JSON.parse(newData);
+  //   else return {};
+  // });
 
-  useEffect(() => {
-    data.Set("commentsData", JSON.stringify(commentsData));
-  }, [commentsData]);
+  // useEffect(() => {
+  //   data.Set("commentsData", JSON.stringify(commentsData));
+  // }, [commentsData]);
 
-  const updateCommentsData = (data: CommentsType) => {
-    setCommentsData((prevComments: CommentsObjectType) => {
-      const newData = structuredClone(prevComments);
-      if (!newData[data.cardId]) newData[data.cardId] = {};
-      if (!newData[data.cardId][data.commentId])
-        newData[data.cardId][data.commentId] = { ...data };
-      newData[data.cardId][data.commentId] = data;
-      return newData;
-    });
-  };
-
-  const removeComment = (card_id: string, comment_id: string) => {
-    setCommentsData((prevCommentsData) => {
-      const newData = structuredClone(prevCommentsData);
-      delete newData[card_id][comment_id];
-      return newData;
-    });
-  };
+  const commentsData = useAppSelector((state) => state.comments);
 
   return (
     <>
@@ -75,8 +59,6 @@ const CardInfo = ({ content }: CardInfoProps) => {
       <ul className="card__item-comments-block">
         <CommentsBlock
           comments={commentsData[content.cardId]}
-          updateCommentsState={updateCommentsData}
-          remove={removeComment}
         />
       </ul>
 
@@ -84,7 +66,6 @@ const CardInfo = ({ content }: CardInfoProps) => {
         <Modal active={activeCommentCreate} setActive={setActiveCommentCreate}>
           <AddCommentsForm
             close={close}
-            create={(e: CommentsType) => updateCommentsData(e)}
             placeholder="Enter your comment:"
             card={content.cardId}
           />

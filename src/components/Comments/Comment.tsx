@@ -5,20 +5,24 @@ import deletion from "../../icons/delete.png";
 import edit from "../../icons/edit.png";
 import { CommentsType } from "../../types/types";
 import { useState } from "react";
+import { useAppDispatch } from "../../redux/store";
+import { commentsSlice } from "../../modules/comments-slice";
 
 type CommentProps={
   content:CommentsType
-  remove:(arg1:string,arg2:string)=>void,
-  updateCommentsState:(arg:CommentsType)=>void
+  //remove:(arg1:string,arg2:string)=>void,
+  //updateCommentsState:(arg:CommentsType)=>void
 }
-const Comment = ({updateCommentsState,remove, content}:CommentProps)=>{
+const Comment = ({ content}:CommentProps)=>{
   const [activeCommentEdit, setActiveCommentEdit] = useState(false);
+  const dispatch = useAppDispatch();
 
   const EditComment = (e:string) => {
-    const newData=structuredClone(content);
-    newData.text = e;
-    updateCommentsState(newData);
+    dispatch(commentsSlice.actions.editComment({CardId:content.cardId,commentId:content.commentId,newCommentText:e}));
   };
+  const removeComment = ()=>{
+    dispatch(commentsSlice.actions.removeComment({commentId:content.commentId,CardId:content.cardId}));
+  }
 
   const Handle = (e:React.MouseEvent<HTMLImageElement>) => {
     e.stopPropagation();
@@ -36,7 +40,7 @@ const Comment = ({updateCommentsState,remove, content}:CommentProps)=>{
                 <img
                   src={deletion}
                   alt=""
-                  onClick={()=>remove(content.cardId,content.commentId)}
+                  onClick={removeComment}
                 />
                 <img src={edit} alt="" onClick={(e)=>Handle(e)} />
               </div>
@@ -50,8 +54,8 @@ const Comment = ({updateCommentsState,remove, content}:CommentProps)=>{
                 <SetDataForm
                   prev={content.text}
                   close={close}
-                  changeData={(e:string) =>
-                    EditComment(e)
+                  changeData={
+                    EditComment
                   }
                   placeholder="Enter your comment:"
                 />
