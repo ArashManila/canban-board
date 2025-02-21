@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect } from "react";
 
 import utiles from "../../utiles/utiles";
 
 import { CardType } from "../../types/types";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 type AddCardFormProps={
   close:()=>void,
@@ -10,41 +11,65 @@ type AddCardFormProps={
   tid:number
 }
 
+interface addCardI{
+  title:string,
+  desc:string
+}
+
 const AddCardForm = ({create,close,tid}:AddCardFormProps)=>{
+
+  const {register,handleSubmit,reset} = useForm<addCardI>({
+    mode:"onChange"
+  });
 
   const id = utiles.makeid(5);
 
-  const [cardTitle,setCardTitle] = useState<string>('');
-  const [cardDesc,setCardDesc] = useState<string>('');
-
-  const handleTitle = (e:React.ChangeEvent<HTMLInputElement>)=>{
-    setCardTitle(e.target.value)
-  }
-  const handleDesc = (e:React.ChangeEvent<HTMLInputElement>)=>{
-    setCardDesc(e.target.value)
-  }
-
-  const saveCard = ()=>{
-    if(cardTitle === "") return;
-    const data:CardType ={
-      title:cardTitle,
-      desc:cardDesc,
+  const onSubmit:SubmitHandler<addCardI> = (data)=>{
+    if(data.title === "" || data.desc === "") return;
+    const dataSet:CardType ={
+      title:data.title,
+      desc:data.desc,
       cardId:id,
       tableId:tid
     }
     
-    create(data);
+    create(dataSet);
     close();
   }
 
+  useEffect(()=>{
+    reset({
+      title:'card title',
+      desc:'card desc'
+    })
+  },[reset])
+
   return (
-    <div>
-      <input value={cardTitle} onChange={handleTitle} name="" id="" placeholder='Enter Card Title...'></input>
-      <input value={cardDesc} onChange={handleDesc}  name="" id="" placeholder='Enter Card Desc...'></input>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input 
+        {...register("title",{ //распаковываем register, говорим,что данное поле required, делаем ему паттерн ввода и указываем текст ошибки если не соотвествуем ему
+          required:"This fiels is required",
+          maxLength:15,
+          minLength:3,
+        })}
+        name="" 
+        id="" 
+        placeholder='Enter Card Title...'>
+        </input>
+      <input 
+        {...register("desc",{ //распаковываем register, говорим,что данное поле required, делаем ему паттерн ввода и указываем текст ошибки если не соотвествуем ему
+          required:"This fiels is required",
+          maxLength:24,
+          minLength:3,
+        })} 
+        name="" 
+        id="" 
+        placeholder='Enter Card Desc...'>
+        </input>
       <div className='flex p-1'>
-        <button onClick={()=>saveCard()} className='p-1 rounded bg-sky-600 text-white mr-2'>Add Card</button>
+        <button className='p-1 rounded bg-sky-600 text-white mr-2' type="submit">Add Card</button>
       </div>
-    </div>
+    </form>
   );
 }
 

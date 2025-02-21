@@ -1,34 +1,46 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import data from "../../DataManagment/dataM";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 type AuthProps = {
   setActive: (active: boolean) => void;
 };
+interface authI{
+  name:string
+}
 const AuthForm = ({ setActive }: AuthProps) => {
-  const [name, setName] = useState<string>("");
-  function SaveUserName(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    if (!name) return;
+
+  const {register,handleSubmit,reset} = useForm<authI>({
+    mode:"onChange"
+  })
+
+  useEffect(()=>{
+    reset({
+      name:""
+    })
+  },[reset])
+
+  const onSubmit:SubmitHandler<authI> = (dataN)=>{
+    if (!dataN.name) return;
     else {
-      data.Set("User name", name);
+      data.Set("User name", dataN.name);
       setActive(false);
     }
   }
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <label htmlFor="name">User name:</label>
       <input
         type="text"
         id="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        {...register("name",{required:true})}
         placeholder="Enter your name:"
       />
-      <button onClick={SaveUserName} className="button">
+      <button className="button" type="submit">
         Save
       </button>
-    </>
+    </form>
   );
 };
 
